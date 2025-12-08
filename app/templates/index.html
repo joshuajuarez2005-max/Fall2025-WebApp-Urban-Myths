@@ -1,10 +1,24 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Urban Myths</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
 
-{% block title %}
-Home - My Flask App 
-{% endblock %}
+<body>
+    <div class="navbar">
+        <h2>Urban Myths</h2>
+        <div>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </div>
+    </div>
 
-{% block content %}
-    <h2>Welcome to My Flask App!</h2>
-    <a href="{{ url_for('main.about') }}">Go to About Page</a>
-{% endblock%}
+    <div class="container">
+        <h1>Welcome to the Urban Myth Database</h1>
+        <p>Search and explore myths, legends, and mysterious stories.</p>
+    </div>
+</body>
+</html>
+
+

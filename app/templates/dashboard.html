@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="navbar">
+        <h2>My Dashboard</h2>
+        <div>
+            <a href="/">Home</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Explore Urban Myths</h2>
+
+        {% for myth in myths %}
+        <div class="card">
+            <h3>{{ myth.name }}</h3>
+            <p>{{ myth.description }}</p>
+            <small>Location: {{ myth.location }}</small>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
