@@ -1,39 +1,27 @@
-"""
-This is the config.py script 
-
-This script will call the load_dotenv() function in order to extract our env variables
-
-Then well will set up our application with these env variables 
-
-The keys well will call: 
-- Flask's secret key: SECRET_KEY 
-- Database's connection values:
-    - DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
-"""
-
-import os ## We need to extract environment secret variables 
-from pathlib import Path ## This is to extract the directory's path 
-from dotenv import load_dotenv ## TO pull the secret keys from the .env file 
-
-## First thing we do is, is load the variables from the .env file into the process enviroment (OS system)
-load_dotenv()
+import os
 
 class Config:
-    """
-    This is the configuration object 
-    """
+    # Flask
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-change-me")
+    SECURITY_PASSWORD_SALT = os.environ.get("SECURITY_PASSWORD_SALT", "dev-salt-change-me")
 
-    ## Get the project base directory 
-    BASE_DIR = Path(__file__).resolve().parent ## 
+    # MySQL - hardcode for now so it DEFINITELY matches MySQL
+    DB_HOST = "127.0.0.1"          # use TCP, not socket
+    DB_PORT = 3306
+    DB_USER = "flaskuser"
+    DB_PASSWORD = "password123"
+    DB_NAME = "urban_myths_db"
 
-    ## Extract the Flask secret Key:
-    SECRET_KEY = os.getenv("SECRET_KEY")
+    # Email (Gmail)
 
-    ## Extract the My SQL Settings:
-    DB_HOST = os.getenv("DB_HOST")
-    DB_PORT = int(os.getenv("DB_PORT"))
-    DB_USER = os.getenv("DB_USER")
-    DB_PASSWORD = os.getenv("DB_PASSWORD")
-    DB_NAME = os.getenv("DB_NAME")
+    # ... your Flask + DB config above ...
 
+    # Email (Gmail)
+    MAIL_SERVER = "smtp.gmail.com"
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
 
+    # For local dev / school project, you can hardcode these:
+    MAIL_USERNAME = "gustavito1107@gmail.com"
+    MAIL_PASSWORD = "mxcnjkyxjuhogowd"  # <-- remove all spaces
+ # no spaces

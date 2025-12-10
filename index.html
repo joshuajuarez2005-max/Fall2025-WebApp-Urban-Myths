@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home - Urban Myths</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="navbar">
+    <h2>Home</h2>
+    <div>
+        <a href="{{ url_for('main.index') }}">Home</a>
+        <a href="{{ url_for('main.login') }}">Login</a>
+        <a href="{{ url_for('main.register') }}">Register</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Welcome to Urban Myths</h2>
+    <p>Explore and share mysterious stories, legends, and more.</p>
+</div>
+
+</body>
+</html>
