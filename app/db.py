@@ -1,60 +1,92 @@
 """
-This is the db.py script 
-This script will be responsible for connecting to your Mysql database and cleanning it up properly 
+db.py
+Handles all MySQL database connections, cleanup, and simple query testing.
 
-1st: Its becasue it gives us a centralized connection logic
-2nd: Whenever we want to use the db, we can call this script to connect to our database 
-3rd: we'll properly open and properly close the database connection 
+Why this file matters:
+1. Centralizes connection logic.
+2. Any route/file can call get_db() to access MySQL.
+3. Ensures connections open *and close properly* for every request.
 """
 
-import mysql.connector ## This is the driver for MySQL, It's important to connect with python 
-from flask import current_app, g ## current_app give us the configurations we need from the config.py script 
-## And the g bascially stores the per-request data that we get back from the config call
+import mysql.connector
+from mysql.connector import Error
+from flask import current_app, g
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
+
+# ---------------------------------------
+# Get Database Connection
+# ---------------------------------------
 def get_db():
     """
-    The purpose of this function 'get_db()' is to open up the sql connection and send it to your python location 
-
-    - the 'g' is a special flask object that exists only for one request 
-    - First we have to call in a request, then store it in the g object as g.db 
-    - Then for later calls, we just reuse the g.db object
-    - At the end of the call, we close the coonection using the close_db() that we'll create later
+    Opens a MySQL connection and stores it in g.db for the current request.
+    If the connection fails, returns None instead of crashing the app.
     """
-
     if "db" not in g:
-        g.db = mysql.connector.connect(
-            host = current_app.config["DB_HOST"],
-            port = current_app.config["DB_PORT"],
-            user = current_app.config["DB_USER"],
-            password = current_app.config["DB_PASSWORD"],
-            database = current_app.config["DB_NAME"],
-        )
+        try:
+            g.db = mysql.connector.connect(
+                host = current_app.config.get("DB_HOST"),
+                port=current_app.config["DB_PORT"],
+                user=current_app.config["DB_USER"],
+                password=current_app.config["DB_PASSWORD"],
+                database=current_app.config["DB_NAME"],
+            )
+        except Error as e:
+            print("MySQL connection error:", e)
+            g.db = None
+
     return g.db
 
+
+# ---------------------------------------
+# Close Database Connection
+# ---------------------------------------
 def close_db(e=None):
     """
-    This function closes the database connection at the end of a request 
-
-    This is because Flask calls it automatically, because we'll intialize as such in our init_app() function that
-    We'll also create in a bit
+    Closes the database connection at the end of the request.
+    Flask will automatically call this because init_app() registers it.
     """
-
-    db = g.pop("db", None) ## removes "db" from g if it does exist
+    db = g.pop("db", None)
     if db is not None:
         db.close()
 
+
+# ---------------------------------------
+# Flask Integration
+# ---------------------------------------
 def init_app(app):
     """
-    This is called from the __innit__.py script, once the flask app instance is created 
-
-    This registers close_db(), so every request automatically closes the DB connection after 
+    Registers the database cleanup function with Flask.
+    This ensures each request opens & closes the DB properly.
     """
-    app.teardown_appcontext(close_db) ## calling the close_db() function
+    app.teardown_appcontext(close_db)
 
-def query_test(sql, parmas=()):
-    
+
+# ---------------------------------------
+# Simple Query Test Helper
+# ---------------------------------------
+def query_test(sql, params=()):
+    """
+    Runs a simple SELECT query.
+    Returns True if a row exists, False otherwise.
+
+    If DB connection failed, returns False.
+    """
     conn = get_db()
+    if conn is None:
+        return False
+
     with conn.cursor(dictionary=True) as cur:
-        cur.execute(sql, parmas)
+        cur.execute(sql, params)
         row = cur.fetchone()
         return True if row else False
+    
+class Myth(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    short_description = db.Column(db.String(255), nullable=False)
+    full_story = db.Column(db.Text, nullable=False)
+    location = db.Column(db.String(100))
+    image_url = db.Column(db.String(255))
+    price = db.Column(db.Integer, nullable=False)
